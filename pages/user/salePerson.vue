@@ -1,0 +1,168 @@
+<template>
+	<view class="box">
+		<nav-bar :title="'销售'" :back="true"></nav-bar>
+			<view class="info">销售</view>
+			<view class="list-cell b-b m-t" v-for="(item,saleindex) in salePersons" :key="saleindex"   hover-class="cell-hover" :hover-stay-time="50" @click="detail(item)">
+				<image :src="item.avatar" mode="scaleToFill" border="0" class="my_65"></image>
+				<text class="cell-tit">{{item.nickname}} - {{item.phone}}</text>
+				<view class="cell_right">
+					<span style="font-size: 26upx;">{{item.balance}}元</span>
+				</view>
+			</view>
+			
+			<u-modal title="修改用户余额" :show="updateShow" :zoom="false" confirmText="提交" showCancelButton
+				confirmColor="#515ffb" @confirm="shopRecharge()" @cancel = "cancle()">
+				<u-form :model="form" ref="uForm">
+						<u-form-item label="输入金额"><u-input type="number" v-model="rechargeMoney" /></u-form-item>
+						<u-form-item label="类型">
+							<u-radio-group v-model="radio">
+								<u-radio v-for="(va, index) in radioList" :key="index" :name="va.value" >
+									{{ va.name }}
+								</u-radio>
+							</u-radio-group>
+						</u-form-item>
+					</u-form>
+			</u-modal>
+	</view>
+</template>
+
+<script> 
+	import {
+		getAllSale
+	} from '@/api/user.js'
+	export default {
+		data() {
+			return {
+				radio: '',
+				form:"",
+				updateShow:false,
+				rechargeId:0,
+				rechargeMoney:0,
+				that: this,
+				salePersons:[],
+				//查询条件
+				queryParam: {
+					pageNo: 1,
+					pageSize: 20,
+					nickname:"",
+					userId:0
+				},
+				radioList: [
+					{
+						value:'0',
+						name: '加款'
+					},
+					{
+						value:'1',
+						name: '扣款'
+					}
+				],
+			};
+		},
+		filters: {
+			//格式化日期
+			formatDate(data, that) {
+				return that.globalUtil.dateTimeFormat(data)
+			},
+		},
+		onLoad(e) {
+			if(!e.uid){
+				uni.showToast({
+					title:"请选择用户",
+					icon:'none'
+				})
+				return false;
+			}
+			this.queryParam.userId = e.uid;
+			this.init()
+		},
+		methods: {
+			detail(item){
+				uni.navigateTo({
+					url: "/pages/user/info?uid=" + item.id
+				});
+			},
+			init(){
+				getAllSale(this.queryParam).then(res => {
+					if(res.success){
+						this.salePersons = res.voList
+					}
+				})
+			},
+			
+		}
+	}
+</script>
+
+<style scoped lang='scss'>
+	page {
+		background: #f8f8f8;
+	}
+
+	.my_65 {
+		/* white-space: normal;
+		width: 14px;
+		height: 15px;
+		padding: 0px;
+		margin-top: 9px;
+		float: left;
+		border-radius: 0px;
+		font-size: 14px;
+		line-height: 15px; */
+		    white-space: normal;
+		    width: 40px;
+		    height: 40px;
+		    position: absolute;
+		    left: 0px;
+	}
+
+	.list-cell {
+		display: flex;
+		align-items: baseline;
+		padding: 20upx 30upx;
+		line-height: 60upx;
+		position: relative;
+		background: #fff;
+		justify-content: center;
+
+		&.log-out-btn {
+			margin: 0 auto;
+			margin-top: 40upx;
+			border-radius: 6px;
+			width: 85%;
+			line-height: 22px;
+			background: #515ffb !important;
+
+			.cell-tit {
+				font-size: 16px !important;
+				color: #fff !important;
+				text-align: center;
+				margin-right: 0;
+			}
+		}
+
+		&.cell-hover {
+			background: #fafafa;
+		}
+
+		&.b-b:after {
+			left: 30upx;
+		}
+
+		&.m-t {
+			margin-top: 16upx;
+		}
+
+		.cell-tit {
+			flex: 1;
+			font-size: 28upx + 2upx;
+			color: #303133;
+			margin-left: 33px;
+		}
+
+	}
+	.info{
+		padding: 2px 4px;
+		color:#4f66ff;
+	}
+</style>
