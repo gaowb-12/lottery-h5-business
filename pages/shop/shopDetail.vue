@@ -13,20 +13,48 @@
 				<span style="font-size:9px;">绑定时间：{{shop.createTime|formatDate(that)}}</span>
 			</view>
 		</view>
-		
+<!-- 		
 		<view class="scyh_class">
 			<span class="kq" v-if="shop.line == 1" @click="updateShop(0)">开启</span>
 			<span class="tz" v-if="shop.line == 0" @click="updateShop(1)">关店</span>
 			<span class="kq" @click="addChannel()">添加通道</span>
-		</view>
-			
+		</view> -->
+		
 		<u-form :model="fone" ref="uForm" style="margin-top: 10px;background-color: #fff;" >
-				<u-form-item label="设定店铺扣款比例"  label-width="200">
-					<u-input  v-model="shop.shopRate" @blur="updateShopRate()"/>
+				<u-form-item label="昵称"  label-width="200">
+					<u-input  v-model="shop.name"/>
+				</u-form-item>
+		</u-form>
+		<u-form :model="fone" ref="uForm" style="margin-top: 10px;background-color: #fff;" >
+				<u-form-item label="用户名"  label-width="200">
+					<u-input  v-model="shop.username"/>
+				</u-form-item>
+		</u-form>
+		<u-form :model="fone" ref="uForm" style="margin-top: 10px;background-color: #fff;" >
+				<u-form-item label="店铺余额"  label-width="200">
+					<u-input  v-model="shop.balance"/>
+				</u-form-item>
+		</u-form>
+		<u-form :model="fone" ref="uForm" style="margin-top: 10px;background-color: #fff;" >
+				<u-form-item label="扣款比率"  label-width="200">
+					<u-input  v-model="shop.shopRate"/>
+				</u-form-item>
+		</u-form>
+		<u-form :model="fone" ref="uForm" style="margin-top: 10px;background-color: #fff;">
+				<u-form-item label="设定店铺等级区间"  label-width="200">
+					<u-input type="number" inputAlign="center" v-model="shop.startGrade"/>
+					<u--text align="center" size="20" style="flex: 0.3;" text="-"></u--text>
+					<u-input type="number" inputAlign="center" v-model="shop.endGrade"/>
 				</u-form-item>
 		</u-form>
 		
-		<u-form  :model="ftwo" ref="uForm" style="margin-top: 10px;background-color: #fff;" >
+		<u-form :model="fone" ref="uForm" style="margin-top: 10px;background-color: #fff;" >
+				<u-form-item label="抢单数量"  label-width="200">
+					<u-input  v-model="shop.orderCount"/>
+				</u-form-item>
+		</u-form>
+		<u-button @click="submit" style="background-color: #515ffb;color:#fff; margin-top: 25px">提交</u-button>
+		<!-- <u-form  :model="ftwo" ref="uForm" style="margin-top: 10px;background-color: #fff;" >
 				<view v-for="(item,index) in shop.channels" :key="index">
 					<span v-if="index%3==0 && index<3" style="padding: 1px 3px;background-color: #8d8d8d;color: #fff;">通道{{index+1}}</span>
 					<span v-if="index%3==0 && index>=3" style="padding: 1px 3px;background-color: #8d8d8d;color: #fff;">通道{{index/3+1}}</span>
@@ -50,15 +78,17 @@
 						<u-form-item label="支付宝公钥"><u-input type="text" v-model="alipay_public_kay" /></u-form-item>
 						<u-form-item label="应用私钥"><u-input type="text" v-model="alipay_private_kay" /></u-form-item>
 					</u-form>
-			</u-modal>
+			</u-modal> -->
 	</view>
 </template>
 
 <script> 
 	import {
-		shopDetail,
+		shopDetailX,
+		updateShopX,
 		updateShopLine,
 		editShopRate,
+		editShopGrade,
 		updateLine,
 		addAliPayKey,
 		deleteAliPayKey
@@ -116,170 +146,243 @@
 			
 		},
 		methods: {
-			delChannel(item){
-				uni.showModal({
-				    title: '店铺',
-				    content: "删除支付通道",
-				    success: function (res) {
-				        if (res.confirm) {
-							uni.showLoading();
-				            deleteAliPayKey({"channelId":item.channelId,"tenantId":item.tenantId}).then(res=>{
-								if(res.success){
-									uni.hideLoading();
-									uni.showToast({
-										title: '操作成功！',
-										icon: 'none'
-									});
-									setTimeout(function() {
-										location.reload()
-									}, 1000);
-								}
-							})
-				        } else if (res.cancel) {
-				            console.log('用户点击取消');
-				        }
-				    }
-				})
-			},
-			addShopChannel(){
-				this.addPayChannel = false
-				uni.showLoading()
-				addAliPayKey({"aliPayAppId":this.alipay_appid_kay,"alipayPrivateKey":this.alipay_private_kay,
-				"alipayPublicKey":this.alipay_public_kay,"tenantId":this.shop.id}).then(res=>{
+			submit(){
+				uni.showLoading();
+				if(this.shop.username==""){
+					uni.showToast({
+						title: "请输入用户名",
+						icon: "none"
+					})
+					return false
+				}
+				
+				if(this.shop.name==""){
+					uni.showToast({
+						title: "请输入昵称",
+						icon: "none"
+					})
+					return false
+				}
+				if(this.shop.password==""){
+					uni.showToast({
+						title: "请输入密码",
+						icon: "none"
+					})
+					return false
+				}
+				debugger
+				updateShopX(this.shop).then(res=>{
+					
 					if(res.success){
 						uni.hideLoading();
 						uni.showToast({
-							title: '操作成功！',
-							icon: 'none'
-						});
+							title: "创建成功",
+							icon: "none"
+						})
 						setTimeout(function() {
-							location.reload()
+							location.reload();	
 						}, 1000);
 					}
 				})
 			},
+			// updateShopGrade(type,grade){
+			// 	if(grade==""){
+			// 		uni.showToast({
+			// 			title: "等级区间不能为空",
+			// 			icon: "none"
+			// 		})
+			// 		return false
+			// 	}
+			// 	let th = this
+			// 	uni.showModal({
+			// 	    title: '店铺',
+			// 	    content: "修改店铺等级区间",
+			// 	    success: function (res) {
+			// 	        if (res.confirm) {
+			// 				uni.showLoading();
+			// 	            editShopGrade({"id":th.shop.id,"type":type,"grade":grade}).then(res => {
+			// 					if(res.success){
+			// 						uni.hideLoading();
+			// 						uni.showToast({
+			// 							title: '操作成功！',
+			// 							icon: 'none'
+			// 						});
+			// 						setTimeout(function() {
+			// 							location.reload()
+			// 							}, 1000);
+			// 					}
+			// 				})
+			// 	        } else if (res.cancel) {
+			// 	            console.log('用户点击取消');
+			// 	        }
+			// 	    }
+			// 	})
+			// },
+			// delChannel(item){
+			// 	uni.showModal({
+			// 	    title: '店铺',
+			// 	    content: "删除支付通道",
+			// 	    success: function (res) {
+			// 	        if (res.confirm) {
+			// 				uni.showLoading();
+			// 	            deleteAliPayKey({"channelId":item.channelId,"tenantId":item.tenantId}).then(res=>{
+			// 					if(res.success){
+			// 						uni.hideLoading();
+			// 						uni.showToast({
+			// 							title: '操作成功！',
+			// 							icon: 'none'
+			// 						});
+			// 						setTimeout(function() {
+			// 							location.reload()
+			// 						}, 1000);
+			// 					}
+			// 				})
+			// 	        } else if (res.cancel) {
+			// 	            console.log('用户点击取消');
+			// 	        }
+			// 	    }
+			// 	})
+			// },
+			// addShopChannel(){
+			// 	this.addPayChannel = false
+			// 	uni.showLoading()
+			// 	addAliPayKey({"aliPayAppId":this.alipay_appid_kay,"alipayPrivateKey":this.alipay_private_kay,
+			// 	"alipayPublicKey":this.alipay_public_kay,"tenantId":this.shop.id}).then(res=>{
+			// 		if(res.success){
+			// 			uni.hideLoading();
+			// 			uni.showToast({
+			// 				title: '操作成功！',
+			// 				icon: 'none'
+			// 			});
+			// 			setTimeout(function() {
+			// 				location.reload()
+			// 			}, 1000);
+			// 		}
+			// 	})
+			// },
 			
-			updateGame(item) {
-				uni.showLoading();
-				let line = 0;
-				if(item.line == false){line = 1}	
-				updateLine({"id":item.id,"line":line,"tenantId":item.tenantId}).then(res=>{
-					if(res.success){
-						uni.hideLoading();
-						uni.showToast({
-							title: '操作成功！',
-							icon: 'none'
-						});
-						setTimeout(function() {
-							location.reload()
-							}, 1000);
-					}
-				})
-			},
-			updateShopRate(){
-				let th = this
-				uni.showModal({
-				    title: '店铺',
-				    content: "修改店铺扣款比例",
-				    success: function (res) {
-				        if (res.confirm) {
-							uni.showLoading();
-				            editShopRate({"id":th.shop.id,"shopRate":th.shop.shopRate}).then(res => {
-								if(res.success){
-									uni.hideLoading();
-									uni.showToast({
-										title: '操作成功！',
-										icon: 'none'
-									});
-									setTimeout(function() {
-										location.reload()
-										}, 1000);
-								}
-							})
-				        } else if (res.cancel) {
-				            console.log('用户点击取消');
-				        }
-				    }
-				})
-			},
-			updateShop(line){
-				let th = this
-				uni.showModal({
-				    title: '店铺',
-				    content: "确认操作么",
-				    success: function (res) {
-				        if (res.confirm) {
-							uni.showLoading();
-				            updateShopLine({"id":th.shop.id,"line":line}).then(res => {
-								if(res.success){
-									uni.hideLoading();
-									uni.showToast({
-										title: '操作成功！',
-										icon: 'none'
-									});
-									setTimeout(function() {
-										location.reload()
-										}, 1000);
-								}
-							})
-				        } else if (res.cancel) {
-				            console.log('用户点击取消');
-				        }
-				    }
-				})
-			},
+			// updateGame(item) {
+			// 	uni.showLoading();
+			// 	let line = 0;
+			// 	if(item.line == false){line = 1}	
+			// 	updateLine({"id":item.id,"line":line,"tenantId":item.tenantId}).then(res=>{
+			// 		if(res.success){
+			// 			uni.hideLoading();
+			// 			uni.showToast({
+			// 				title: '操作成功！',
+			// 				icon: 'none'
+			// 			});
+			// 			setTimeout(function() {
+			// 				location.reload()
+			// 				}, 1000);
+			// 		}
+			// 	})
+			// },
+			// updateShopRate(){
+			// 	let th = this
+			// 	uni.showModal({
+			// 	    title: '店铺',
+			// 	    content: "修改店铺扣款比例",
+			// 	    success: function (res) {
+			// 	        if (res.confirm) {
+			// 				uni.showLoading();
+			// 	            editShopRate({"id":th.shop.id,"shopRate":th.shop.shopRate}).then(res => {
+			// 					if(res.success){
+			// 						uni.hideLoading();
+			// 						uni.showToast({
+			// 							title: '操作成功！',
+			// 							icon: 'none'
+			// 						});
+			// 						setTimeout(function() {
+			// 							location.reload()
+			// 							}, 1000);
+			// 					}
+			// 				})
+			// 	        } else if (res.cancel) {
+			// 	            console.log('用户点击取消');
+			// 	        }
+			// 	    }
+			// 	})
+			// },
+			// updateShop(line){
+			// 	let th = this
+			// 	uni.showModal({
+			// 	    title: '店铺',
+			// 	    content: "确认操作么",
+			// 	    success: function (res) {
+			// 	        if (res.confirm) {
+			// 				uni.showLoading();
+			// 	            updateShopLine({"id":th.shop.id,"line":line}).then(res => {
+			// 					if(res.success){
+			// 						uni.hideLoading();
+			// 						uni.showToast({
+			// 							title: '操作成功！',
+			// 							icon: 'none'
+			// 						});
+			// 						setTimeout(function() {
+			// 							location.reload()
+			// 							}, 1000);
+			// 					}
+			// 				})
+			// 	        } else if (res.cancel) {
+			// 	            console.log('用户点击取消');
+			// 	        }
+			// 	    }
+			// 	})
+			// },
 			
 			addChannel(){
 				this.addPayChannel = true
 			},
-			shopRecharge(){
-				let _rechargeId = this.rechargeId;
-				let _type = this.radio;
-				let _price = this.rechargeMoney;
-				this.updateShow = false
-				uni.showModal({
-				    title: '余额',
-				    content: "确认操作么",
-				    success: function (res) {
-				        if (res.confirm) {
-							uni.showLoading();
-				            shopkeeperRecharge(_rechargeId ,{'price':_price,'type':_type}).then(res => {
-								if(res.success){
-									uni.hideLoading();
-									uni.showToast({
-										title: '操作成功！',
-										icon: 'none'
-									});
-									setTimeout(function() {
-										location.reload()
-										}, 1000);
-								}
-							})
-				        } else if (res.cancel) {
-				            console.log('用户点击取消');
-				        }
-				    }
-				})
+			// shopRecharge(){
+			// 	let _rechargeId = this.rechargeId;
+			// 	let _type = this.radio;
+			// 	let _price = this.rechargeMoney;
+			// 	this.updateShow = false
+			// 	uni.showModal({
+			// 	    title: '余额',
+			// 	    content: "确认操作么",
+			// 	    success: function (res) {
+			// 	        if (res.confirm) {
+			// 				uni.showLoading();
+			// 	            shopkeeperRecharge(_rechargeId ,{'price':_price,'type':_type}).then(res => {
+			// 					if(res.success){
+			// 						uni.hideLoading();
+			// 						uni.showToast({
+			// 							title: '操作成功！',
+			// 							icon: 'none'
+			// 						});
+			// 						setTimeout(function() {
+			// 							location.reload()
+			// 							}, 1000);
+			// 					}
+			// 				})
+			// 	        } else if (res.cancel) {
+			// 	            console.log('用户点击取消');
+			// 	        }
+			// 	    }
+			// 	})
 				
-			},
+			// },
 			cancle(){
 				this.addPayChannel = false
 			},
 			init(){
-				shopDetail(this.queryParam).then(res => {
+				debugger
+				shopDetailX(this.queryParam).then(res => {
 					if(res.success){
 						this.shop = res
-						let arr = res.ballGames
-						this.shop.ballGames.forEach((item,index)=>{
-							if(item.line == "0"){
-								item.line = true
-								return false
-							}
-							if(item.line == "1"){
-								item.line = false
-								return false
-							}
-						})
+						// let arr = res.ballGames
+						// this.shop.ballGames.forEach((item,index)=>{
+						// 	if(item.line == "0"){
+						// 		item.line = true
+						// 		return false
+						// 	}
+						// 	if(item.line == "1"){
+						// 		item.line = false
+						// 		return false
+						// 	}
+						// })
 						
 					}
 				})

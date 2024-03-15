@@ -8,12 +8,17 @@
 		<view class="YmContent">
 			<view class="my_1">
 				<view class="my_3">
-					<image style="border-radius: 50%;" :src="user.avatar" mode="scaleToFill" border="0" class="my_4">
+					<image v-if="sysId==1" style="border-radius: 50%;" :src="user.avatar" mode="scaleToFill" border="0" class="my_4">
+					</image>
+					<image v-else style="border-radius: 50%;" src="https://beijingtu.s3.ap-east-1.amazonaws.com/1_14546bee-04ad-4ac4-8cfa-ac144ba08e20_头像头像.png" mode="scaleToFill" border="0" class="my_4">
 					</image>
 					<view class="my_5">
 						<text decode="true" class="my_7"></text>
-						<text id="fen" class="my_7">
+						<text v-if="sysId==1" id="fen" class="my_7">
 							超级管理员
+						</text>
+						<text v-else id="fen" class="my_7">
+							{{this.adminUser}}
 						</text>
 					</view>
 					</image>
@@ -24,18 +29,18 @@
 					</view>
 					<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
 						<view class="my_24">
-							<image v-on:click="navClick('/pages/order/lotteryOrder')"
-								src="/static/images/personal/personal/orderManger.png" mode="scaleToFill" border="0"
-								class="my_25">
-							</image>
-							<text decode="true" class="my_26">所有</text>
-						</view>
-						<view class="my_24">
 							<image v-on:click="navClick('/pages/order/waitTicket')"
 								src="/static/images/personal/personal/ticket.png" mode="scaleToFill" border="0"
 								class="my_25">
 							</image>
 							<text decode="true" class="my_26">待出票</text>
+						</view>
+						<view class="my_24">
+							<image v-on:click="navClick('/pages/order/openAward')"
+								src="/static/images/personal/personal/cash.png" mode="scaleToFill" border="0"
+								class="my_25">
+							</image>
+							<text decode="true" class="my_26">待开奖</text>
 						</view>
 						<view class="my_24">
 							<image v-on:click="navClick('/pages/order/waitAward')"
@@ -45,78 +50,94 @@
 							<text decode="true" class="my_26">待派奖</text>
 						</view>
 					</view>
+					<view v-if="sysId==1">
+						<view class="my_99" style="height: 100%;">
+							<span style="color:#6a6a6a; font-size: 16px;">财务</span>
+						</view>
+						<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
+							<view class="my_24">
+								<image v-on:click="navClick('/pages/pay/withdrawalRecord')"
+									src="/static/images/personal/personal/cash.png" mode="scaleToFill" border="0"
+									class="my_25">
+								</image>
+								<text decode="true" class="my_26">提现申请</text>
+							</view>
+						</view>
+						<view class="my_99" style="height: 100%;">
+							<span style="color:#6a6a6a; font-size: 16px;">赛事信息</span>
+						</view>
+						<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
+							<view class="my_24">
+								<image @click="navClick2(1)" src="/static/images/personal/personal/football.png" border="0"
+									class="my_25">
+								</image>
+								<text decode="true" class="my_26">足球赛事设置</text>
+							</view>
+							<view class="my_24">
+								<image @click="navClick2(2)" src="/static/images/personal/personal/basketball.png"
+									border="0" class="my_25">
+								</image>
+								<text decode="true" class="my_26">篮球赛事设置</text>
+							</view>
+							<view class="my_24">
 
-					<view class="my_99" style="height: 100%;">
-						<span style="color:#6a6a6a; font-size: 16px;">财务</span>
-					</view>
-					<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
-						<view class="my_24">
-							<image v-on:click="navClick('/pages/pay/withdrawalRecord')"
-								src="/static/images/personal/personal/cash.png" mode="scaleToFill" border="0"
-								class="my_25">
-							</image>
-							<text decode="true" class="my_26">提现申请</text>
+							</view>
 						</view>
-					</view>
-					<view class="my_99" style="height: 100%;">
-						<span style="color:#6a6a6a; font-size: 16px;">赛事信息</span>
-					</view>
-					<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
-						<view class="my_24">
-							<image @click="navClick2(1)" src="/static/images/personal/personal/football.png" border="0"
-								class="my_25">
-							</image>
-							<text decode="true" class="my_26">足球赛事设置</text>
-						</view>
-						<view class="my_24">
-							<image @click="navClick2(2)" src="/static/images/personal/personal/basketball.png"
-								border="0" class="my_25">
-							</image>
-							<text decode="true" class="my_26">篮球赛事设置</text>
-						</view>
-						<view class="my_24">
-
-						</view>
-					</view>
 
 
-					<view class="my_99" style="height: 100%;">
-						<span style="color:#6a6a6a; font-size: 16px;">店铺</span>
-					</view>
-					<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
+						<view class="my_99" style="height: 100%;">
+							<span style="color:#6a6a6a; font-size: 16px;">店铺</span>
+						</view>
+						<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
 
-						<view class="my_24">
-							<image v-on:click="navClick('/pages/shop/createShop')"
-								src="/static/images/personal/personal/addShop.png" mode="scaleToFill" border="0"
-								class="my_25">
-							</image>
-							<text decode="true" class="my_26">创建店铺</text>
+							<view class="my_24">
+								<image v-on:click="navClick('/pages/shop/createShop')"
+									src="/static/images/personal/personal/addShop.png" mode="scaleToFill" border="0"
+									class="my_25">
+								</image>
+								<text decode="true" class="my_26">创建店铺</text>
+							</view>
+							<view class="my_24">
+								<image v-on:click="navClick('/pages/shop/shopList')"
+									src="/static/images/personal/personal/shopManger.png" mode="scaleToFill" border="0"
+									class="my_25">
+								</image>
+								<text decode="true" class="my_26">店铺设置</text>
+							</view>
+							<view class="my_24">
+								<!-- <image v-on:click="navClick('/pages/shop/shopList')"
+									src="/static/images/personal/personal/shopManger.png" mode="scaleToFill" border="0" class="my_25">
+								</image>
+								<text decode="true" class="my_26">店铺设置</text> -->
+							</view>
 						</view>
-						<view class="my_24">
-							<image v-on:click="navClick('/pages/shop/shopList')"
-								src="/static/images/personal/personal/shopManger.png" mode="scaleToFill" border="0"
-								class="my_25">
-							</image>
-							<text decode="true" class="my_26">店铺设置</text>
-						</view>
-						<view class="my_24">
-							<!-- <image v-on:click="navClick('/pages/shop/shopList')"
-								src="/static/images/personal/personal/shopManger.png" mode="scaleToFill" border="0" class="my_25">
-							</image>
-							<text decode="true" class="my_26">店铺设置</text> -->
-						</view>
-					</view>
 
-					<view class="my_99" style="height: 100%;">
-						<span style="color:#6a6a6a;font-size: 16px;">站点</span>
+						<view class="my_99" style="height: 100%;">
+							<span style="color:#6a6a6a;font-size: 16px;">站点</span>
+						</view>
+						<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
+							<view class="my_24">
+								<image v-on:click="navClick('/pages/station/index')"
+									src="/static/images/personal/personal/setting.png" mode="scaleToFill" border="0"
+									class="my_25">
+								</image>
+								<text decode="true" class="my_26">站点设置</text>
+							</view>
+						</view>
 					</view>
-					<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
-						<view class="my_24">
-							<image v-on:click="navClick('/pages/station/index')"
-								src="/static/images/personal/personal/setting.png" mode="scaleToFill" border="0"
-								class="my_25">
-							</image>
-							<text decode="true" class="my_26">站点设置</text>
+					<view v-if="sysId!=1">
+						<view class="my_49" style="display: flex;height: 570upx;margin-bottom:15upx ;"></view>
+						<view class="my_99" style="height: 100%;">
+							<span style="color:#6a6a6a;font-size: 16px;">个人设置（待开发）</span>
+						</view>
+						<view class="my_23" style="display: flex;align-items: center;justify-content: space-between;">
+							<view class="my_24">
+								<image
+									src="/static/images/personal/personal/setting.png" mode="scaleToFill" border="0"
+									class="my_25">
+								</image>
+								<text decode="true" class="my_26">密码修改</text>
+							</view>
 						</view>
 					</view>
 					<view class="my_49" style="height: 100%;">
@@ -126,6 +147,7 @@
 							<text decode="true" class="my_64">退出登录</text>
 						</view>
 					</view>
+					
 				</view>
 			</view>
 		</view>
@@ -166,16 +188,22 @@
 		setUserInfo,
 		removeAuthtoken,
 		removeUserInfo,
-		removeExternalLogintoken
+		removeExternalLogintoken,
+		removeadminUser,
+		getadminUser
 	} from "@/util/auth.js"
 	export default {
 		data() {
 			return {
 				user: {},
 				isShow: false,
+				sysId:'',
+				adminUser:''
 			}
 		},
 		onLoad() {
+			this.sysId=uni.getStorageSync("sysId")
+			this.adminUser=uni.getStorageSync("sysName");
 			this.init()
 		},
 		methods: {
@@ -183,14 +211,14 @@
 				this.isShow = true;
 			},
 			init() {
-				getUser().then(res => {
-					if (res.status == "1") {
-						this.logout();
-					}
-					setUserInfo(res);
-					this.user = res
-					console.log(this.user)
-				})
+				// getUser().then(res => {
+				// 	if (res.status == "1") {
+				// 		this.logout();
+				// 	}
+				// 	setUserInfo(res);
+				// 	this.user = res
+				// 	console.log(this.user)
+				// })
 			},
 			navClick(url) {
 				uni.navigateTo({
@@ -237,6 +265,10 @@
 						removeAuthtoken();
 						removeExternalLogintoken();
 						removeUserInfo();
+						uni.removeStorageSync('sysId');
+						uni.removeStorageSync('shop');
+						uni.removeStorageSync("sysName");
+						removeadminUser();
 						setTimeout(() => {
 							uni.redirectTo({
 								url: "/pages/user/login"
@@ -270,7 +302,8 @@
 	}
 
 	#fen {
-		font-size: 12px;
+		font-size: 20px;
+		font-weight: bold;
 		letter-spacing: 0.2rem;
 		background-image: -webkit-linear-gradient(left, #fff, #6665f6 25%, #fff 50%, #6665f6 75%, #fff);
 		-webkit-text-fill-color: transparent;

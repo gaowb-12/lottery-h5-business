@@ -46,11 +46,11 @@
 
 <script>
 	import {
-		getLotteryOrderPage,
+		chupiaoOrderX,
+		getLotteryOrderPageX,
 	} from '@/api/lotteryOrder.js'
 	import {
 		deleteOrder,
-		chupiaoOrder,
 		paijiangOrder,
 		getUser
 	} from "@/api/user.js"
@@ -78,6 +78,7 @@
 				}],
 				//查询条件
 				queryParam: {
+					sysId:'',
 					userId: "",
 					state: "0",
 					startTime: "",
@@ -125,6 +126,7 @@
 			if (option.uid != undefined) {
 				this.queryParam.userId = option.uid;
 			}
+			this.queryParam.sysId=uni.getStorageSync("sysId")
 			this.init();
 		},
 		//滚动到底部进行分页事件
@@ -205,7 +207,7 @@
 				    content: str,
 				    success: function (res) {
 				        if (res.confirm) {
-				            chupiaoOrder({'id':id,'state':state}).then(res => {
+				            chupiaoOrderX({'id':id,'state':state}).then(res => {
 								if(res.success){
 									uni.showToast({
 										title: '操作成功！',
@@ -254,7 +256,7 @@
 				// 	}
 				// 	this.user = res
 				// })
-				getLotteryOrderPage(this.queryParam).then(res => {
+				getLotteryOrderPageX(this.queryParam).then(res => {
 					this.total = res.total;
 					this.lotteryOrderList = [...this.lotteryOrderList, ...res.voList]
 					setTimeout(function() {
@@ -312,6 +314,6 @@
 	.delOrder{
 		color:#fff;float: right;padding: 4upx 8upx;background-color: #e10000;margin-bottom: 15upx;margin-right: 15upx;
 	}
-	.chupiao{background-color: #00d600;}
+	.chupiao{background-color: #515ffb}
 	.paijiang{background-color: #5555ff;}
 </style>

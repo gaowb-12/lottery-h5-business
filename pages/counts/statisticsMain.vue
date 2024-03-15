@@ -6,7 +6,7 @@
 		</cmd-nav-bar>
 		<view  style="margin-top: 30upx;">
 			<!-- type = 'datetimerange' 加上时分秒 -->
-			<uni-datetime-picker type="datetimerange" @change="change"  @type="top"/>
+			<uni-datetime-picker type="daterange" @change="change"  @type="top"/>
 		</view>
 		<view class="zhjx">
 			<view class="zhjx_item">
@@ -15,11 +15,22 @@
 			</view>
 			<view class="line"></view>
 			<view class="zhjx_item">
-				<text>{{totalWinningPrice}}</text>
-				<text>中奖总金额(已派奖)</text>
+				<text>{{totalPointsPrice}}</text>
+				<text>扣点后总金额</text>
 			</view>
 		</view>
-		<view class="dz_class">
+		<view class="zhjx">
+			<view class="zhjx_item">
+				<text>{{totalAwardPrice}}</text>
+				<text>派奖总金额</text>
+			</view>
+			<view class="line"></view>
+			<view class="zhjx_item">
+				<text>{{totalBalancePrice}}</text>
+				<text>平台余额</text>
+			</view>
+		</view>
+		<!-- <view class="dz_class">
 			<text class="title">对账汇总</text>
 			<view class="cz_class">
 				<view class="cz_item" @click="navClick('/pages/counts/statisList')"> 
@@ -57,11 +68,14 @@
 					<text class="cz_tyetx3">{{totalDeductionPrice}}</text>
 				</view>
 			</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 
 <script>
+	import {
+		getShopCountX
+	} from '@/api/shop.js'
 	import {
 		getUser,
 		getShopCount,
@@ -71,14 +85,15 @@
 		},
 		data() {
 			return {
+				
 				user:{},
 				defaultData: {},
 				indexT: 0,
 				//查询条件
 				queryParam: {
+					sysId:'',
 					startTime: "",
 					endTime: "",
-					tenantId:0
 				},
 				totalDeductionPrice:0,	//扣款总金额
 				totalOutTicketPrice:0,	//出票总金额
@@ -86,6 +101,9 @@
 				totalWinningPrice:0,	//中奖总金额
 				totalAddFundsPrice:0, 	//加款总金额
 				totalWithdrawalPrice:0,	//提现总金额
+				totalPointsPrice:0,//扣除点位后总金额totalBalancePrice
+				totalAwardPrice:0,//派奖总金额
+				totalBalancePrice:0,//平台余额
 			}
 		},
 		onLoad(e) {
@@ -93,6 +111,7 @@
 			if(e){
 				this.queryParam.tenantId = e.tenantId 
 			}
+			this.queryParam.sysId=uni.getStorageSync("sysId")
 			this.init();
 		},
 		methods: {
@@ -116,13 +135,12 @@
 			//初始化事件
 			init() {
 				uni.showLoading();
-				getShopCount(this.queryParam).then(res => {
-					this.totalDeductionPrice = res.totalDeductionPrice
-					this.totalOutTicketPrice= res.totalOutTicketPrice
-					this.totalRechargePrice= res.totalRechargePrice
-					this.totalWinningPrice= res.totalWinningPrice
-					this.totalAddFundsPrice= res.totalAddFundsPrice
-					this.totalWithdrawalPrice= res.totalWithdrawalPrice
+				debugger
+				getShopCountX(this.queryParam).then(res => {
+					this.totalOutTicketPrice = res.totalOutTicketPrice
+					this.totalPointsPrice= res.totalPointsPrice
+					this.totalAwardPrice= res.totalAwardPrice
+					this.totalBalancePrice= res.totalBalancePrice
 					setTimeout(function() {
 						uni.hideLoading();
 					}, 500);
@@ -179,7 +197,7 @@
 		flex-direction: row;
 		justify-content: space-around;
 		align-items: center;
-		border-radius: 30px;
+		border-radius: 9px;
 		background: linear-gradient(91deg, #8D68FF 5.05%, #2E58FF 104.36%);
 		margin: 30rpx;
 		padding: 40rpx 20rpx;

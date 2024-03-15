@@ -119,8 +119,11 @@
 				uni.setStorageSync("shop", this.shop)
 				setadminUser(this.login.username)
 				await login(this.login).then(res => {
+					debugger
 					if (res.success) {
 						setAuthtoken(res.token)
+						uni.setStorageSync("sysId",res.id);
+						uni.setStorageSync("sysName",res.name);
 						setTimeout(() => {
 							uni.redirectTo({
 								url: "../order/lotteryOrder"

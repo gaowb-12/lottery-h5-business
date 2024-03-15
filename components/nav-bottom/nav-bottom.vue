@@ -14,7 +14,8 @@
 	export default {
 		data() {
 			return {
-				tabBarList: [{
+				tabBarList:[],
+				adminList: [{
 					"pagePath": "pages/order/lotteryOrder",
 					"text": "订单",
 					"src": "../../static/tabbar/orders.png",
@@ -38,6 +39,32 @@
 					"src": "../../static/tabbar/admin.png",
 					"srcSelect": "../../static/tabbar/admin_active.png"
 				}],
+				userList: [{
+					"pagePath": "pages/order/lotteryOrder",
+					"text": "订单",
+					"src": "../../static/tabbar/orders.png",
+					"srcSelect": "../../static/tabbar/orders_active.png"
+				},
+				{
+					"pagePath": "pages/counts/statisticsMain",
+					"text": "统计",
+					"src": "../../static/tabbar/counts.png",
+					"srcSelect": "../../static/tabbar/counts_active.png"
+				},
+				{
+					"pagePath": "pages/personal/personal",
+					"text": "管理",
+					"src": "../../static/tabbar/admin.png",
+					"srcSelect": "../../static/tabbar/admin_active.png"
+				}
+			  ],
+			}
+		},
+		created() {
+			if(uni.getStorageSync("sysId")==1){
+				this.tabBarList=[...this.adminList]
+			}else{
+				this.tabBarList=[...this.userList]
 			}
 		},
 		props: {

@@ -46,7 +46,8 @@
 
 <script>
 	import {
-		getLotteryOrderPage,
+		paijiangOrderX,
+		getLotteryOrderPageX,
 	} from '@/api/lotteryOrder.js'
 	import {
 		deleteOrder,
@@ -78,6 +79,7 @@
 				}],
 				//查询条件
 				queryParam: {
+					sysId:'',
 					userId: "",
 					state: "3",
 					startTime: "",
@@ -125,6 +127,7 @@
 			if (option.uid != undefined) {
 				this.queryParam.userId = option.uid;
 			}
+			this.queryParam.sysId=uni.getStorageSync("sysId")
 			this.init();
 		},
 		//滚动到底部进行分页事件
@@ -163,17 +166,19 @@
 			paijiang(id){
 				var str = '确认一键派奖?';
 				if(id != 0){
-					str = '确认派奖该订单: '+id+'?'
+					str = '确认派奖该订单?'
 				}else{
 					id = "";
 				}
+				let that=this
 				uni.showModal({
 				    title: '派奖',
-				   editable:true,
-				   placeholderText:"请输入实际派奖金额",
+					content: str,
+				   // editable:true,
+				   // placeholderText:"请输入实际派奖金额",
 				    success: function (res) {
 				        if (res.confirm) {
-				            paijiangOrder({'id':id, inWinPrice: Number(res.content)}).then(res => {
+				            paijiangOrderX({'id':id,'sysId': that.sysId}).then(res => {
 								if(res.success){
 									uni.showToast({
 										title: '操作成功！',
@@ -255,7 +260,7 @@
 				// 	}
 				// 	this.user = res
 				// })
-				getLotteryOrderPage(this.queryParam).then(res => {
+				getLotteryOrderPageX(this.queryParam).then(res => {
 					this.total = res.total;
 					this.lotteryOrderList = [...this.lotteryOrderList, ...res.voList]
 					setTimeout(function() {

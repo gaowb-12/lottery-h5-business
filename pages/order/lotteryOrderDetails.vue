@@ -39,7 +39,7 @@
 					@click="chupiao(lotteryOrder.id)"></u-button>
 			</span>
 
-			<span style="width:200upx;display: block;" v-if="stating == '0'">
+			<span style="width:200upx;display: block;" v-if="stating == '0'&&sysId==1">
 				<u-button type="error" text="退票"
 					@click="retreatSigle(lotteryOrder.id)"></u-button>
 			</span>
@@ -615,6 +615,8 @@
 		getLotteryOrderPage,
 		getLotteryOrderById,
 		actual,
+		chupiaoOrderX,
+		paijiangOrderX,
 		orderRetreat
 	} from '@/api/lotteryOrder.js'
 	import cfg from '@/util/environment.js';
@@ -623,17 +625,14 @@
 	import {
 		update
 	} from '../../api/shop';
-	import {
-		chupiaoOrder,
-		paijiangOrder
-	} from "@/api/user.js"
 	export default {
 		data() {
 			return {
 				lotteryOrder: {},
 				that: this,
 				stating: "",
-				saiguo:""
+				saiguo:"",
+				sysId:'',
 			}
 		},
 		computed: {
@@ -665,6 +664,7 @@
 		onLoad(option) {
 			this.stating = option.state;
 			this.init(option.id);
+			this.sysId=uni.getStorageSync("sysId")
 			console.log(this.stating)
 		},
 		filters: {
@@ -743,24 +743,66 @@
 			}
 		},
 		methods: {
+			chupiao(id) {
+				var str = '确认一键出票?';
+				var state = "1";
+				if (id != 0) {
+					str = '确认出票该订单: ' + id + '?'
+				} else {
+					id = "";
+					state = "";
+				}
+				let that=this
+				uni.showModal({
+					title: '出票',
+					content: str,
+					success: function(res) {
+						if (res.confirm) {
+							chupiaoOrderX({
+								'id': id,
+								'state': state,
+								'sysId': that.sysId
+							}).then(res => {
+								if (res.success) {
+									uni.showToast({
+										title: '操作成功！',
+										icon: 'none'
+									});
+									setTimeout(function() {
+										uni.navigateTo({
+											url: "/pages/order/lotteryOrder",
+											animationType: 'pop-in',
+											animationDuration: 200
+										})
+										location.reload()
+									}, 1000);
+								}
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				})
+			},
 			
 			// 派奖
 			paijiang(id){
-				let th = this;
 				var str = '确认一键派奖?';
 				if(id != 0){
-					str = '确认派奖该订单: '+id+'?'
+					str = '确认派奖该订单?'
 				}else{
 					id = "";
 				}
+				let that=this
 				uni.showModal({
 				    title: '派奖',
-				    // content: str,
-					editable:true,
-					placeholderText:"请输入实际派奖金额",
+				    content: str,
+					// editable:true,
+					// placeholderText:"请输入实际派奖金额",
 				    success: function (res) {
 				        if (res.confirm) {
-				            paijiangOrder({'id':id, inWinPrice: Number(res.content)}).then(res => {
+							debugger
+				            paijiangOrderX({'id':id,'sysId': that.sysId}).then(res => {
 								if(res.success){
 									uni.showToast({
 										title: '操作成功！',
@@ -898,46 +940,6 @@
 							urls: urlList
 						})
 					},
-					chupiao(id) {
-						var str = '确认一键出票?';
-						var state = "1";
-						if (id != 0) {
-							str = '确认出票该订单: ' + id + '?'
-						} else {
-							id = "";
-							state = "";
-						}
-						uni.showModal({
-							title: '出票',
-							content: str,
-							success: function(res) {
-								if (res.confirm) {
-									chupiaoOrder({
-										'id': id,
-										'state': state
-									}).then(res => {
-										if (res.success) {
-											uni.showToast({
-												title: '操作成功！',
-												icon: 'none'
-											});
-											setTimeout(function() {
-												uni.navigateTo({
-													url: "/pages/order/lotteryOrder",
-													animationType: 'pop-in',
-													animationDuration: 200
-												})
-												location.reload()
-											}, 1000);
-										}
-									})
-								} else if (res.cancel) {
-									console.log('用户点击取消');
-								}
-							}
-						})
-					},
-
 					//返回事件处理
 					backClick() {
 						//如果是从下单页面过来的直接跳转首页。

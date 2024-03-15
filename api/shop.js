@@ -94,7 +94,6 @@ export function createShop(data) {
 	})
 }
 
-
 /**
  * 站点获取
  */
@@ -138,3 +137,46 @@ export function setSaiguo(data) {
     })
 }
 
+export function createShopX(data) {
+	return request({
+		url: '/admin/shop/addX',
+		method: 'post',
+		data
+	})
+}
+export function shopListX(data) {
+	return request({
+		url: '/admin/shop/listX',
+		method: 'post',
+		data
+	})
+}
+
+
+/**
+ * 店铺详情
+ */
+export function shopDetailX(data) {
+	return request({
+		url: '/admin/shop/shopDetailX',
+		method: 'post',
+		data
+	})
+}
+
+
+export function updateShopX(data) {
+	return request({
+		url: '/admin/shop/updateX',
+		method: 'put',
+		data
+	})
+}
+
+export function getShopCountX(data) {
+	return request({
+		url: '/admin/statistics/countShopPriceX',
+		method: 'post',
+		data
+	})
+}

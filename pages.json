@@ -124,6 +124,10 @@
 			"style": {}
 		},
 		{
+			"path": "pages/order/openAward",
+			"style": {}
+		},
+		{
 			"path": "pages/shop/shopList",
 			"style": {}
 		},

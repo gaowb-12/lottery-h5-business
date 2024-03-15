@@ -65,6 +65,22 @@ export function getLotteryOrderPage(data) {
 	})
 }
 
+export function getLotteryOrderPageX(data) {
+	return request({
+		url: '/admin/lottery/order/listX',
+		method: 'post',
+		data
+	})
+}
+
+export function robOrderX(data) {
+	return request({
+		url: '/admin/lottery/order/robOrder',
+		method: 'post',
+		data
+	})
+}
+
 export function getLotteryOrderPage2(data) {
 	return request({
 		url: '/app/lottery/order/list2',
@@ -91,5 +107,39 @@ export function centre() {
 	return request({
 		url: '/app/lottery/order/centre',
 		method: 'get',
+	})
+}
+/**
+ * 撤单
+ */
+export function revokeOrder(data) {
+	return request({
+		url: '/admin/lottery/order/revokeOrder',
+		method: 'post',
+		data
+	})
+}
+
+/**
+ * 出票
+ *  @param {*} data
+ */
+export function chupiaoOrderX(data) {
+	return request({
+		url: '/admin/lottery/order/ticketingX',
+		method: 'put',
+		data
+	})
+}
+
+/**
+ * 派奖
+ *  @param {*} data
+ */
+export function paijiangOrderX(data) {
+	return request({
+		url: '/admin/lottery/order/awardX',
+		method: 'put',
+		data
 	})
 }

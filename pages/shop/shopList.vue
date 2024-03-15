@@ -2,6 +2,10 @@
 	<view class="box">
 		<nav-bar :title="'店铺'" :back="true"></nav-bar>
 			<nav-bottom :current="9"></nav-bottom>
+			<view  style="margin-top: 10upx;display: flex;padding: 10rpx;align-items: center;">
+			<span style="font-size: 14px;margin-left: 14px;margin-right: 4%;color: #505153;">商户名:</span>	<view style="width: 65%;margin-right: 1%;"><u-input v-model="queryParam.name" type="number"clearable /></view>
+				<u-button size="mini" type="primary" @click="search" style="width: 60rpx;background-color: #515ffb;height:66upx;font-size: 13px">搜索</u-button>
+			</view>
 			<view class="list-cell b-b m-t" v-for="(item,index) in complaints" :key="index"   hover-class="cell-hover" :hover-stay-time="50" @click="detail(item)">
 				<image :src="item.logo" mode="scaleToFill" border="0" class="my_65"></image>
 				<text class="cell-tit">{{item.name}} -- {{item.shopkeeperNickname}}
@@ -17,7 +21,7 @@
 				</view>
 			</view>
 			
-			<u-modal title="修改用户余额" :show="updateShow" :zoom="false" confirmText="提交" showCancelButton
+			<!-- <u-modal title="修改用户余额" :show="updateShow" :zoom="false" confirmText="提交" showCancelButton
 				confirmColor="#515ffb" @confirm="shopRecharge()" @cancel = "cancle()">
 				<u-form :model="form" ref="uForm">
 						<u-form-item label="输入金额"><u-input type="number" v-model="rechargeMoney" /></u-form-item>
@@ -29,13 +33,13 @@
 							</u-radio-group>
 						</u-form-item>
 					</u-form>
-			</u-modal>
+			</u-modal> -->
 	</view>
 </template>
 
 <script> 
 	import {
-		shopList
+		shopListX
 	} from '@/api/shop.js'
 	export default {
 		data() {
@@ -47,9 +51,9 @@
 				rechargeMoney:0,
 				that: this,
 				complaints:[
-					{"id":1,"name":"haha","logo":"http://app.tianyingty.xyz/logo.png","balance":100},
-					{"id":1,"name":"haha","logo":"http://app.tianyingty.xyz/logo.png","balance":100},
-					{"id":1,"name":"haha","logo":"http://app.tianyingty.xyz/logo.png","balance":100},
+					// {"id":1,"name":"haha","logo":"http://app.tianyingty.xyz/logo.png","balance":100},
+					// {"id":1,"name":"haha","logo":"http://app.tianyingty.xyz/logo.png","balance":100},
+					// {"id":1,"name":"haha","logo":"http://app.tianyingty.xyz/logo.png","balance":100},
 				],
 				//查询条件
 				queryParam: {
@@ -81,6 +85,26 @@
 			this.init()
 		},
 		methods: {
+			search() {
+				this.init()
+			},
+			init(){
+				uni.showLoading();
+				shopListX(this.queryParam).then(res => {
+					if(res.success){
+						this.complaints = res.voList
+					}
+					setTimeout(function() {
+						uni.hideLoading();
+					}, 500);
+				})
+			},
+			detail(item){
+				console.log(item);
+				uni.navigateTo({
+					url: "/pages/shop/shopDetail?shopId=" + item.id
+				});
+			},
 			update(item){
 				this.rechargeId = item.userId
 				this.updateShow = true
@@ -117,20 +141,6 @@
 			},
 			cancle(){
 				this.updateShow = false
-			},
-			init(){
-				shopList(this.queryParam).then(res => {
-					if(res.success){
-						this.complaints = res.voList
-					}
-				})
-			},
-			
-			detail(item){
-				console.log(item);
-				uni.navigateTo({
-					url: "/pages/shop/shopDetail?shopId=" + item.id
-				});
 			},
 			del(item) {
 				uni.showModal({

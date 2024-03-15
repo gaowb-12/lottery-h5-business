@@ -3,10 +3,9 @@
 	<view class="box">
 		
 		<nav-bar :title="'订单记录'" :back="true"></nav-bar>
-		<nav-bottom :current="0"></nav-bottom>
-		
+		<nav-bottom :current="0"></nav-bottom>		
 		<u-sticky bgColor="#fff" style="margin-bottom: 4px;"  > 
-			<u-tabs :list="lassificationcList" lineColor="#515ffb" :current="currentIndex" :scrollable="false" 
+			<u-tabs :list="lassificationcList" lineColor="#515fff" :current="currentIndex" :scrollable="false" 
 				:activeStyle="currentIndex === 3 ? activeStyle : activeStyle" @click="changeSelectBall">
 			</u-tabs>
 		</u-sticky>
@@ -15,7 +14,7 @@
 		</view>
 		<view  style="margin-top: 10upx;display: flex;padding: 10rpx;align-items: center;">
 		<span style="font-size: 12px;margin-right: 4px;">订单编号:</span>	<view style="width: 70%;"><u-input v-model="queryParam.orderId" type="number"clearable /></view>
-			<u-button size="mini" type="primary" @click="search" style="width: 60rpx;;">搜索</u-button>
+			<u-button size="mini" type="primary" @click="search" style="width: 60rpx;" color="#5555ff">搜索</u-button>
 		</view>
 		<view>
 			<u-empty icon="http://cdn.uviewui.com/uview/empty/order.png" :show="lotteryOrderList.length<=0" mode="order"
@@ -27,21 +26,25 @@
 				:style="[{animation: 'show ' + ((index+1)*0.2+1) + 's 1'}]"
 				:sub-title="item.createTime|formatDate(that)" :extra="'订单'+item.price+'元'" :thumbnail="item.ballUrl"
 				>
-				<view @click="details(item.id, stating)">订单编号：<span class="uni-body">{{item.orderId}}</span></view>
-				<view @click="details(item.id, stating)">用户：<span class="uni-body">{{item.nickname}} </span>&nbsp;&nbsp;
+				<view @click="stating!=8&&details(item.id, stating)">订单编号：<span class="uni-body">{{item.orderId}}</span></view>
+				<view @click="stating!=8&&details(item.id, stating)">用户：<span class="uni-body">{{item.nickname}} </span>&nbsp;&nbsp;
 					<span class="uni-body-moni" v-if="  item.moni == '1'"> 模拟</span>
 				</view>
 				
-				<view @click="details(item.id, stating)" v-if=" item.fd == '1'"><span class="uni-body">发单</span>&nbsp;&nbsp;
+				<view @click="stating!=8&&details(item.id, stating)" v-if=" item.fd == '1'"><span class="uni-body">发单</span>&nbsp;&nbsp;
 					<span class="uni-body-moni" > {{item.fdh}}</span>
 				</view>
 				
-				<view @click="details(item.id, stating)" v-if=" item.gd == '1'"><span class="uni-body">跟单 </span>&nbsp;&nbsp;
+				<view @click="stating!=8&&details(item.id, stating)" v-if=" item.gd == '1'"><span class="uni-body">跟单 </span>&nbsp;&nbsp;
 					<span class="uni-body-moni" > {{item.gdh}}</span>
 				</view>
 				
-				<view @click="details(item.id, stating)">订单状态：<span class="uni-body"
+				<view @click="stating!=8&&details(item.id, stating)">订单状态：<span v-if="stating!=8" class="uni-body"
 						:style="item.state=='3'||item.state=='4'?'color: #515ffb':''">{{item.state|formatState}}</span>
+						<span v-else class="uni-body"
+								:style="item.state=='3'||item.state=='4'?'color: #515ffb':''">{{stating|formatState}}</span>
+						<u-button v-if="stating==8" style="width: 20%;float: right;height: 100%;padding: 10rpx;" @click.native.stop="robOrder(item.id)" color="#5555ff" text="抢单"></u-button>
+						<u-button v-if="stating==0&&sysId==1" style="width: 20%;float: right;height: 100%;padding: 10rpx;" @click.native.stop="revokeOrder(item.id)" color="#5555ff" text="撤单"></u-button>
 				</view >
 				<!-- <view v-if="item.winPrice!=undefined">中奖金额：<span class="uni-body"
 						style="color: #515ffb;font-size: 18px;"
@@ -57,7 +60,10 @@
 
 <script>
 	import {
-		getLotteryOrderPage,
+		revokeOrder,
+		robOrderX,
+		getLotteryOrderPageX,
+		paijiangOrderX,
 	} from '@/api/lotteryOrder.js'
 	import {
 		deleteOrder,
@@ -68,11 +74,16 @@
 	export default {
 		data() {
 			return {
+				sysId:'',
 				user:{},
 				that: this,
-				stating:0,
+				stating:8,
 				currentIndex: 0,
-				lassificationcList: [{
+				lassificationcList: [
+				{
+					name: '待抢单',
+					state: "8"
+				},{
 					name: '待出票',
 					state: "0"
 				}, {
@@ -87,11 +98,13 @@
 				}, {
 					name: '已派奖',
 					state: "4"
-				}],
+				}
+				],
 				//查询条件
 				queryParam: {
+					sysId:'',
 					userId: "",
-					state: "0",
+					state: "8",
 					startTime: "",
 					endTime: "",
 					orderId: undefined,
@@ -133,6 +146,8 @@
 					return "已拒绝";
 				} else if (data == 6) {
 					return "已退票";
+				}else if (data == 8) {
+					return "待抢单";
 				}
 			}
 		},
@@ -141,7 +156,9 @@
 				this.queryParam.userId = option.uid;
 				this.queryParam.phone = option.phone;
 			}
-			
+			this.queryParam.sysId=uni.getStorageSync("sysId")
+			this.sysId=uni.getStorageSync("sysId")
+			console.log(this.queryParam.sysId)
 			this.init();
 			
 		},
@@ -154,6 +171,67 @@
 			this.init();
 		},
 		methods: {
+			revokeOrder(id){
+				let th=this
+				th.queryParam.orderId = id;
+				console.log(this.queryParam)
+				uni.showModal({
+				    title: '撤单',
+				    content: '确认撤销该订单吗?',
+				    success: function (res) {
+				        if (res.confirm) {
+							console.log("1111"+th.queryParam)
+				            revokeOrder(th.queryParam).then(res => {
+								if(res.success){
+									uni.showToast({
+										title: '操作成功！',
+										icon: 'none'
+									});
+									setTimeout(function() {
+										location.reload()
+										// th.init();
+										}, 1000);
+										
+								}
+							})
+				        } else if (res.cancel) {
+							th.queryParam.orderId = "";
+				            console.log('用户点击取消');
+				        }
+				    }
+				})
+			},
+			robOrder(id){
+				let th=this
+				th.queryParam.orderId = id;
+				console.log(this.queryParam)
+				debugger
+				uni.showModal({
+				    title: '抢单',
+				    content: '确认抢该订单吗?',
+				    success: function (res) {
+				        if (res.confirm) {
+							console.log("1111"+th.queryParam)
+				            robOrderX(th.queryParam).then(res => {
+								if(res.success){
+									uni.showToast({
+										title: '操作成功！',
+										icon: 'none'
+									});
+									
+									setTimeout(function() {
+										location.reload()
+										}, 1000);
+								}
+							})
+				        } else if (res.cancel) {
+							th.queryParam.orderId = "";
+				            console.log('用户点击取消');
+				        }
+				    }
+				})
+				
+			},
 			delOrder(id){
 				uni.showModal({
 				    title: '删除',
@@ -179,20 +257,21 @@
 			},
 			
 			paijiang(id){
-				let th = this;
-				// var str = '确认一键派奖?';
-				// if(id != 0){
-				// 	str = '确认派奖该订单: '+id+'?'
-				// }else{
-				// 	id = "";
-				// }
+				let that = this;
+				var str = '确认一键派奖?';
+				if(id != 0){
+					str = '确认派奖该订单?'
+				}else{
+					id = "";
+				}
 				uni.showModal({
 				    title: '派奖',
-					editable:true,
-					placeholderText:"请输入实际派奖金额",
+					content: str,
+					// editable:true,
+					// placeholderText:"请输入实际派奖金额",
 				    success: function (res) {
 				        if (res.confirm) {
-				            paijiangOrder({'id':id, inWinPrice: Number(res.content)}).then(res => {
+				            paijiangOrderX({'id':id,'sysId': that.sysId, inWinPrice: Number(res.content)}).then(res => {
 								if(res.success){
 									console.log(res);
 									uni.showToast({
@@ -200,7 +279,7 @@
 										icon: 'none'
 									});
 									setTimeout(function(){
-										th.init();
+										that.init();
 										// location.reload()
 									}, 1000)
 								}
@@ -239,7 +318,7 @@
 			},
 			search() {
 				uni.showLoading();
-				getLotteryOrderPage(this.queryParam).then(res => {
+				getLotteryOrderPageX(this.queryParam).then(res => {
 					this.total = res.total;
 					this.lotteryOrderList = res.voList
 					setTimeout(function() {
@@ -249,14 +328,15 @@
 			},
 			//初始化事件
 			init() {
+				console.log(this.sy)
 				uni.showLoading();
-				getUser().then(res => {
-					if(res.status=="1"){
-						this.logout();
-					}
-					this.user = res
-				})
-				getLotteryOrderPage(this.queryParam).then(res => {
+				// getUser().then(res => {
+				// 	if(res.status=="1"){
+				// 		this.logout();
+				// 	}
+				// 	this.user = res
+				// })
+				getLotteryOrderPageX(this.queryParam).then(res => {
 					this.total = res.total;
 					this.lotteryOrderList = [...this.lotteryOrderList, ...res.voList]
 					setTimeout(function() {
