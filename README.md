@@ -2,4 +2,4 @@
 在线体验地址 [](用户端：http://59.110.9.212:18088/ 店铺端：http://59.110.9.212:18088/ ) 用户端：账号：18888880005 密码 123456 店铺端：账号：user 密码：123456
 
 ### 演示图片
-![https://gitee.com/let_me_smile/h5-business/raw/master/README_files/1.jpg]
+![Image text](https://gitee.com/let_me_smile/h5-business/raw/master/README_files/1.jpg)
