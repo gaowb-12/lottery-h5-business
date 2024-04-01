@@ -15,3 +15,4 @@
 ![Image text](https://gitee.com/let_me_smile/h5-business/raw/master/README_files/11.jpg)
 ![Image text](https://gitee.com/let_me_smile/h5-business/raw/master/README_files/12.jpg)
 ![Image text](https://gitee.com/let_me_smile/h5-business/raw/master/README_files/13.jpg)
+![Image text](https://gitee.com/let_me_smile/h5-business/raw/master/README_files/14.jpg)
