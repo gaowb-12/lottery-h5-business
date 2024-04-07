@@ -16,6 +16,6 @@
 ![Image text](https://github.com/xuqyh/lottery-h5-business/blob/master/README_files/12.jpg)
 ![Image text](https://github.com/xuqyh/lottery-h5-business/blob/master/README_files/13.jpg)
 ![Image text](https://github.com/xuqyh/lottery-h5-business/blob/master/README_files/14.jpg)
-![Uploading image.png…]()
+
 
 
